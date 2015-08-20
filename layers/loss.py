@@ -10,14 +10,10 @@ class EuclidesianLoss(object):
     self.name = "EuclidesianLoss"
 
   def forward(self, data, target):
-    self.loss = np.zeros(len(target), np.float) 
-    for idx in range(len(target)):
-      self.loss[idx] = 0.5 *(target[idx] -  data[idx])**2
+    self.loss =   0.5 *(target -  data)
     return self.loss
   
   def backward(self, data, target):
     '''gradient of EU Loss is: (perdiction - target)'''
-    self.grad = [0.0] * len(target) 
-    for idx in range(len(target)):
-      self.grad[idx] = -(data[idx] - target[idx]) #change direction of gradient
+    self.grad =   -(data - target)#change direction of gradient
     return self.grad

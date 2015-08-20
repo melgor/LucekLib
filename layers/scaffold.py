@@ -32,15 +32,20 @@ class NeuralNetLayer(object):
     return np.sum(loss)
  
   #update parameter in each layer
+  '''  for j in range(layer.n_in):
+          for i in range(layer.n_out):
+            change = layer.a_in[j] * layer.grad_out[i] #BP4
+            layer.w_o[j,i] = layer.w_o[j,i] + self.alfa * change 
+            layer.b_o = layer.b_o + self.alfa * layer.grad_out[i] '''
   def update(self):
     for layer in reversed(self.list_layer):
       if layer.update == True:
-        for j in range(layer.n_in):
-          for i in range(layer.n_out):
-            change = layer.a_in[j] * layer.grad_out[i] #BP4
-            # print layer.name, j, i, change
-            layer.w_o[j,i] = layer.w_o[j,i] + self.alfa * change 
-            layer.b_o = layer.b_o + self.alfa * layer.grad_out[i] 
+        sh1    = layer.a_in.shape[0]
+        sh2    = layer.grad_out.shape[0]
+        change = np.dot(layer.a_in.reshape(sh1,1), layer.grad_out.reshape(sh2,1).transpose())
+        layer.w_o +=  self.alfa * change #change weight
+        layer.b_o +=  self.alfa * layer.grad_out #change  bias
+
 
   def train(self, data, labels,  iterations = 1000):
     for i in xrange(iterations):

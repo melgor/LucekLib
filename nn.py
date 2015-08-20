@@ -44,7 +44,7 @@ def demoClassification():
     n.list_layer.append(LinearNet(10,1))
     n.list_layer.append(Tanh())
     n.loss_layer = EuclidesianLoss()
-    n.train(data, labels, iterations = 10000)
+    n.train(data, labels, iterations = 1000)
     n.test(data, labels)
     # print n.print_report()
     
