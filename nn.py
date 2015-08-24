@@ -8,23 +8,44 @@
 import numpy as np
 import math
 import random
+import cPickle, gzip
 from layers.scaffold import *
 
 
-random.seed(0)
-np.random.seed(0)
+random.seed(110)
+np.random.seed(110)
 
+def vectorized_result(j):
+    e = np.zeros((10, 1))
+    e[j] = 1.0
+    return e
+
+def load_data():
+    f = gzip.open('data/mnist.pkl.gz', 'rb')
+    training_data, validation_data, test_data = cPickle.load(f)
+    f.close()
+    return (training_data, validation_data, test_data)
+
+def load_data_wrapper():
+    tr_d, va_d, te_d = load_data()
+    training_inputs = [np.reshape(x, (784, 1)) for x in tr_d[0]]
+    training_results = [vectorized_result(y) for y in tr_d[1]]
+    training_data = zip(training_inputs, training_results)
+    validation_inputs = [np.reshape(x, (784, 1)) for x in va_d[0]]
+    validation_data = zip(validation_inputs, va_d[1])
+    test_inputs = [np.reshape(x, (784, 1)) for x in te_d[0]]
+    test_data = zip(test_inputs, te_d[1])
+    return (training_data, validation_data, test_data)
 
 def demoMnist():
-  data = np.load('mnist_data.npy')
-  target = np.load('mnist_labels.npy')
+  training_data, validation_data, test_data = load_data_wrapper()
   n = NeuralNetLayer()
-  n.list_layer.append(LinearNet(784,100))
-  n.list_layer.append(Tanh())
-  n.list_layer.append(LinearNet(100,1))
-  n.list_layer.append(Tanh())
+  n.list_layer.append(LinearNet(784,30, name = " 1"))
+  n.list_layer.append(Sigmoid())
+  n.list_layer.append(LinearNet(30,10, name = " 2"))
+  n.list_layer.append(Sigmoid())
   n.loss_layer = EuclidesianLoss()
-
+  n.sgd(training_data, validation_data, learning_rate = 3.0)
 
 def demoClassification():
     # Teach network XOR function
@@ -44,12 +65,12 @@ def demoClassification():
     n.list_layer.append(LinearNet(10,1))
     n.list_layer.append(Tanh())
     n.loss_layer = EuclidesianLoss()
-    n.train(data, labels, iterations = 1000)
+    n.train(data, labels, iterations = 10000, learning_rate = 0.1)
     n.test(data, labels)
     # print n.print_report()
     
 
 
 if __name__ == '__main__':
-    #demoRegression()
     demoClassification()
+    # demoMnist()
