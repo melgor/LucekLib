@@ -10,6 +10,7 @@ import math
 import random
 import cPickle, gzip
 from layers.scaffold import *
+from layers.network2 import *
 
 
 random.seed(110)
@@ -43,8 +44,9 @@ def demoMnist():
   n.list_layer.append(LinearNet(784,30, name = " 1"))
   n.list_layer.append(Sigmoid())
   n.list_layer.append(LinearNet(30,10, name = " 2"))
-  n.list_layer.append(Sigmoid())
-  n.loss_layer = EuclidesianLoss()
+  # n.list_layer.append(Sigmoid())
+  n.loss_layer = SigmoidCrossEntropy() #SigmoidCrossEntropy() # EuclidesianLoss() #SoftMaxLoss()
+  
   n.sgd(training_data, validation_data, learning_rate = 3.0)
 
 def demoClassification():
@@ -64,13 +66,13 @@ def demoClassification():
     # n.list_layer.append(Tanh())
     n.list_layer.append(LinearNet(10,1))
     n.list_layer.append(Tanh())
-    n.loss_layer = EuclidesianLoss()
-    n.train(data, labels, iterations = 10000, learning_rate = 0.1)
+    n.loss_layer = CrossEntropy()
+    n.train(data, labels, iterations = 10000, learning_rate = 3.0)
     n.test(data, labels)
     # print n.print_report()
     
 
 
 if __name__ == '__main__':
-    demoClassification()
-    # demoMnist()
+    # demoClassification()
+    demoMnist()

@@ -19,7 +19,8 @@ class NeuralNetLayer(object):
     data_a = data
     for layer in self.list_layer:
       data_a = layer.forward(data_a)
-
+    
+    # data_a = 1.0/(1.0 + np.exp(-data_a))
     return data_a
 
   #run forward pass throught all layers
@@ -57,7 +58,6 @@ class NeuralNetLayer(object):
       if layer.update == True:
         layer.w_o          -=  self.alfa/self.batch_size * layer.change #change weight
         layer.b_o          -=  self.alfa/self.batch_size * layer.grad_out_acc #change  bias    
-        print "Change:", layer.name, layer.idx, self.alfa/self.batch_size * layer.change
         layer.change       = None 
         layer.grad_out_acc = None 
 

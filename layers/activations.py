@@ -21,18 +21,16 @@ class Tanh(object):
 
   
   def backward(self, grad_out):
-    gradient = self.gradient(self.a_out)
+    gradient = self.gradient(self.a_in)
     back     = np.multiply(grad_out,gradient )
     return back
 
-  # derivative of our Tanh function, in terms of the output (i.e. y)
+  # derivative of our Tanh function, in terms of the intput (i.e. x)
   def gradient(self, data):
     grad = np.ones(len(data), np.float)
     grad = grad- data**2
     return grad 
 
-import warnings
-warnings.filterwarnings("error")
 class Sigmoid(object):
   """Activation function for Neural Net"""
   def __init__(self,  update = False):
@@ -47,27 +45,17 @@ class Sigmoid(object):
   
   def forward(self, data):
     self.a_in  = data
-    # idx = 0
-    # try:
-    #   list_result = list()
-    #   for d in data:
-    #     a_out = 1.0/(1.0 + np.exp(-d))
-    #     list_result.append(a_out)
-    #     idx += 1
-    # except RuntimeWarning:
-    #   print 'Warning was raised as an exception!', data[idx], idx, self.name, self.idx
     self.a_out = 1.0/(1.0 + np.exp(-data))
     return self.a_out[:]
 
   def backward(self, grad_out):
-    gradient = self.gradient(self.a_out)
+    gradient = self.gradient(self.a_in)
     back     = np.multiply(grad_out,gradient)
     return back
 
-  # derivative of our Sigmoid function, in terms of the output (i.e. y)
+  # derivative of our Sigmoid function, in terms of the intput (i.e. x)
   def gradient(self, data):
-    res = self.forward(data)
-    grad = res*(1.0 - res)
+    grad = self.a_out*(1.0 - self.a_out)
     return grad 
 
 
