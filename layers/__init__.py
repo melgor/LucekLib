@@ -1,3 +1,3 @@
 #LucekLIB
 
-__all__ = ['activations', 'innerproduct', 'loss', 'scaffold']
+__all__ = ['activations', 'innerproduct', 'loss', 'scaffold', 'config']

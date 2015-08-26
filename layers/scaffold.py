@@ -3,10 +3,10 @@ from sklearn.metrics import accuracy_score
 from activations import *
 from innerproduct import *
 from loss import *
+import config
 
-''' Idea nad gradient based on http://neuralnetworksanddeeplearning.com/chap2.html'''
+''' Idea and gradient based on http://neuralnetworksanddeeplearning.com/chap2.html'''
 
-#TODO: Implemnent SGD learning
 class NeuralNetLayer(object):
   """docstring for NeuralNetLayer"""
   def __init__(self):
@@ -20,7 +20,6 @@ class NeuralNetLayer(object):
     for layer in self.list_layer:
       data_a = layer.forward(data_a)
     
-    # data_a = 1.0/(1.0 + np.exp(-data_a))
     return data_a
 
   #run forward pass throught all layers
@@ -56,7 +55,8 @@ class NeuralNetLayer(object):
   def updateWeighs(self):
     for layer in reversed(self.list_layer):
       if layer.update == True:
-        layer.w_o          -=  self.alfa/self.batch_size * layer.change #change weight
+        layer.w_o          =  layer.w_o * (1 - self.lmda)- self.alfa/self.batch_size * layer.change #change weight
+        # layer.w_o          -=  self.alfa/self.batch_size * layer.change #change  weight
         layer.b_o          -=  self.alfa/self.batch_size * layer.grad_out_acc #change  bias    
         layer.change       = None 
         layer.grad_out_acc = None 
@@ -89,13 +89,14 @@ class NeuralNetLayer(object):
       if i % 10 == 0:
         print 'error %-14f' % error  
 
-  def sgd(self, training_data, validation_data, batch_size = 10, epochs = 30, learning_rate = 0.1):
+  def sgd(self, training_data, validation_data, batch_size = 10, epochs = 30, learning_rate = 0.1, lmda = 0.1):
     '''Stochastic gradient descent algorithm '''
     #add num of Layer for each
     for idx,layer in enumerate(self.list_layer):
       layer.setIdx(idx)
 
     self.alfa = learning_rate
+    self.lmda = lmda
     self.batch_size = float(batch_size)
     num_example = len(training_data)
     num_batch   = num_example / batch_size
@@ -105,6 +106,7 @@ class NeuralNetLayer(object):
       mini_batches =  [training_data[k:k+batch_size] for k in xrange(0, num_example, batch_size)]
       error = 0.0
       # j = 0
+      config.phase = "Train"
       for batch in mini_batches:
         for x,y in batch:
           self.forward(x)
@@ -112,6 +114,7 @@ class NeuralNetLayer(object):
           self.updateDelta()
         self.updateWeighs()
       #test data
+      config.phase = "Test"
       list_result = list()
       list_groud = list()
       for x,y in validation_data:

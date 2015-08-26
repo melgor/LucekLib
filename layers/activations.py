@@ -58,4 +58,35 @@ class Sigmoid(object):
     grad = self.a_out*(1.0 - self.a_out)
     return grad 
 
+class SoftMax(object):
+  """docstring for SoftMax"""
+  @staticmethod
+  def forward(data):
+    return np.exp(data)/np.sum(np.exp(data))
+
+class ReLU(object):
+  """docstring for ReLU"""
+  def __init__(self,  update = False):
+    self.a_in   = None
+    self.update = update
+    #assign name
+    self.name   = "ReLu"
+    self.idx = None
+
+  def setIdx(self, idx):
+      self.idx = idx
+      
+  def forward(self, data):
+    self.a_in  = data
+    self.a_out = np.where(data > 0, data, 0)
+    return self.a_out[:]
+
+  def backward(self, grad_out):
+    back = np.where(self.a_in > 0, grad_out, 0)
+    return back
+ 
+    
+ 
+    
+
 
