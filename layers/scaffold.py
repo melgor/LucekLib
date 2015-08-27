@@ -55,9 +55,12 @@ class NeuralNetLayer(object):
   def updateWeighs(self):
     for layer in reversed(self.list_layer):
       if layer.update == True:
-        layer.w_o          =  layer.w_o * (1 - self.lmda)- self.alfa/self.batch_size * layer.change #change weight
+        delta              = self.alfa/self.batch_size * layer.change
+        delta_m            = self.momentum * self.velocity[layer.idx] + delta
+        layer.w_o          =  layer.w_o * (1 - self.lmda)- delta_m #change weight
         # layer.w_o          -=  self.alfa/self.batch_size * layer.change #change  weight
         layer.b_o          -=  self.alfa/self.batch_size * layer.grad_out_acc #change  bias    
+        self.velocity[layer.idx] = delta
         layer.change       = None 
         layer.grad_out_acc = None 
 
@@ -89,18 +92,25 @@ class NeuralNetLayer(object):
       if i % 10 == 0:
         print 'error %-14f' % error  
 
-  def sgd(self, training_data, validation_data, batch_size = 10, epochs = 30, learning_rate = 0.1, lmda = 0.1):
+  def sgd(self, training_data, validation_data, batch_size = 10, epochs = 30, step = 10, learning_rate = 0.1, lmda = 0.1, momentum = 0.9):
     '''Stochastic gradient descent algorithm '''
     #add num of Layer for each
+    self.velocity = dict()
     for idx,layer in enumerate(self.list_layer):
       layer.setIdx(idx)
+      self.velocity[idx] = 0.0
 
+    self.div_alfa = 10.0
+    self.momentum = momentum
     self.alfa = learning_rate
     self.lmda = lmda
     self.batch_size = float(batch_size)
     num_example = len(training_data)
     num_batch   = num_example / batch_size
     for epoch in range(epochs):
+      if epoch%step == 0:
+        self.alfa /= self.div_alfa
+        print "Lower learning rate", self.alfa
       random.shuffle(training_data)
       #create mini-batches
       mini_batches =  [training_data[k:k+batch_size] for k in xrange(0, num_example, batch_size)]

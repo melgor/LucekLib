@@ -44,7 +44,7 @@ def demoMnist():
   n.list_layer.append(LinearNet(784,100))
   n.list_layer.append(ReLU())
   n.list_layer.append(LinearNet(100,10))
-  # n.list_layer.append(DropOut())
+  n.list_layer.append(DropOut())
   # n.list_layer.append(Sigmoid())
   n.loss_layer = SigmoidCrossEntropy() #SigmoidCrossEntropy() # EuclidesianLoss() #SoftMaxLoss()
 

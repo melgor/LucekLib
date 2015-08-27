@@ -82,4 +82,19 @@ class DropOut(object):
     self.grad_out = grad_out
     return grad_out * self.mask
 
+class Convolution(object):
+  """docstring for Convolution"""
+  def __init__(self, num_filters=32, kernel = 3, stride = 1, pad = 1):
+    self.num_filters = num_filters
+    self.kernel      = kernel
+    self.stride      = stride
+    self.pad         = pad
+    self.weight      = 
+
+
+  def calcOutPutSize(self, input_size):
+    self.out = (input_size - self.kernel + 2* self.pad)/self.stride + 1
+
+    
+
     
