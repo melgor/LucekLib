@@ -99,14 +99,14 @@ class NeuralNetLayer(object):
     for idx,layer in enumerate(self.list_layer):
       layer.setIdx(idx)
       self.velocity[idx] = 0.0
-
-    self.div_alfa = 10.0
-    self.momentum = momentum
-    self.alfa = learning_rate
-    self.lmda = lmda
+    
+    self.div_alfa   = 10.0
+    self.momentum   = momentum
+    self.alfa       = learning_rate
+    self.lmda       = lmda
     self.batch_size = float(batch_size)
-    num_example = len(training_data)
-    num_batch   = num_example / batch_size
+    num_example     = len(training_data)
+    num_batch       = num_example / batch_size
     for epoch in range(epochs):
       if epoch%step == 0:
         self.alfa /= self.div_alfa
@@ -132,6 +132,46 @@ class NeuralNetLayer(object):
         list_groud.append(y)
       print "Epoch: ", epoch, " ACC: ", accuracy_score(np.asarray(list_groud),np.asarray(list_result))
 
+
+  def learnsiamese(self, train_data, batch_size = 10, epochs = 30, step = 10, learning_rate = 0.1, lmda = 0.1, momentum = 0.9):
+    self.velocity = dict()
+    for idx,layer in enumerate(self.list_layer):
+      layer.setIdx(idx)
+      self.velocity[idx] = 0.0
+
+    self.div_alfa   = 10.0
+    self.momentum   = momentum
+    self.alfa       = learning_rate
+    self.lmda       = lmda
+    self.batch_size = float(batch_size)
+    num_example     = len(training_data)
+    num_batch       = num_example / batch_size
+
+    #create mini-batches
+    mini_batches_ver_1 =  [train_data[0][k:k+batch_size] for k in xrange(0, num_example, batch_size)]
+    mini_batches_ver_2 =  [train_data[1][k:k+batch_size] for k in xrange(0, num_example, batch_size)]
+    mini_batches_target =  [train_data[2][k:k+batch_size] for k in xrange(0, num_example, batch_size)]
+
+    for epoch in range(epochs):
+      if epoch%step == 0:
+        self.alfa /= self.div_alfa
+        print "Lower learning rate", self.alfa
+      
+      error = 0.0
+      config.phase = "Train"
+      for d1,d2,tar in zip(mini_batches_ver_1, mini_batches_ver_2, mini_batches_target) :
+          self.forward(x)
+          error += self.backward(y)
+          self.updateDelta()
+        self.updateWeighs()
+      #test data
+      config.phase = "Test"
+      list_result = list()
+      list_groud = list()
+      for x,y in validation_data:
+        list_result.append(np.argmax(self.forward(x)))
+        list_groud.append(y)
+      print "Epoch: ", epoch, " ACC: ", accuracy_score(np.asarray(list_groud),np.asarray(list_result))
 
   def test(self, data, labels):
     for p,l in zip(data, labels):
